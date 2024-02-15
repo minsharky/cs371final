@@ -50,33 +50,9 @@ def prompt():
 print('** Welcome to Trip Planner App **')
 print()
 
-# eliminate traceback so we just get error message:
-sys.tracebacklimit = 0
-
-#
-# what config file should we use for this session?
-#
-config_file = 'client-config.ini'
-
-#
-# setup base URL to web service:
-#
-configur = ConfigParser()
-configur.read(config_file)
-baseurl = configur.get('client', 'webservice')
-
-lastchar = baseurl[len(baseurl) - 1]
-if lastchar == "/":
-baseurl = baseurl[:-1]
-
-#
-# main processing loop:
-#
-
-# handle user sign in or create new user
-username = sign_in_or_create_user(baseurl)
-
 cmd = prompt()
+
+print()
 
 while cmd != 0:
 if cmd == 1:

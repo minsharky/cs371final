@@ -5,12 +5,13 @@ sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 
 # Define the SPARQL query
 sparql.setQuery("""
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    SELECT ?label
-    WHERE {
-        <http://dbpedia.org/resource/Python_(programming_language)> rdfs:label ?label .
-        FILTER (langMatches(lang(?label), "en"))
-    }
+    SELECT ?universityLabel
+WHERE {
+  ?university 
+      wdt:P31 wd:Q3918;  # Instances of all universities
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
 """)
 
 # Specify the format of the results
@@ -18,7 +19,8 @@ sparql.setReturnFormat(JSON)
 
 # Execute the query and retrieve the results
 results = sparql.query().convert()
-
+for r 
+print(results.keys)
 # Process the results
-for result in results["results"]["bindings"]:
-    print(result["universityLabel"]["value"])
+# for result in results["results"]["bindings"]:
+#     print(result["universityLabel"]["value"])
