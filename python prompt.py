@@ -46,7 +46,7 @@ def prompt():
 ############################################################
 # main
 #
-try:
+
   print('** Welcome to Trip Planner App **')
   print()
 
@@ -144,9 +144,4 @@ try:
   #
   print()
   print('** done **')
-  sys.exit(0)
-
-except Exception as e:
-  logging.error("**ERROR: main() failed:")
-  logging.error(e)
   sys.exit(0)
