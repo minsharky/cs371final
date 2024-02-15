@@ -24,3 +24,5 @@ print(results.keys)
 # Process the results
 # for result in results["results"]["bindings"]:
 #     print(result["universityLabel"]["value"])
+for result in results["results"]["bindings"]:
+    print(result["universityLabel"]["value"])
