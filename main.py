@@ -1,19 +1,19 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 # Set up the SPARQL endpoint URL
-sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 
 # Define the SPARQL query
 sparql.setQuery("""
-    SELECT ?cityLabel WHERE {
-    ?university wdt:P31 wd:Q615150, wd:Q902104;
-    wdt:P131 ?city.
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
-}
-LIMIT 1
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    SELECT ?label
+    WHERE {
+        <http://dbpedia.org/resource/Python_(programming_language)> rdfs:label ?label .
+        FILTER (langMatches(lang(?label), "en"))
+    }
 """)
 
-# Specify the format of the results (optional)
+# Specify the format of the results
 sparql.setReturnFormat(JSON)
 
 # Execute the query and retrieve the results
@@ -21,4 +21,4 @@ results = sparql.query().convert()
 
 # Process the results
 for result in results["results"]["bindings"]:
-    print(result["label"]["value"])
+    print(result["universityLabel"]["value"])
