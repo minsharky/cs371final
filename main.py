@@ -5,12 +5,12 @@ sparql = SPARQLWrapper("http://dbpedia.org/sparql")
 
 # Define the SPARQL query
 sparql.setQuery("""
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    SELECT ?label
-    WHERE {
-        <http://dbpedia.org/resource/Python_(programming_language)> rdfs:label ?label .
-        FILTER (langMatches(lang(?label), "en"))
-    }
+    SELECT ?cityLabel WHERE {
+    ?university wdt:P31 wd:Q615150, wd:Q902104;
+    wdt:P131 ?city.
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE]". }
+}
+LIMIT 1
 """)
 
 # Specify the format of the results (optional)
