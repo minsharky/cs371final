@@ -37,10 +37,58 @@ for result in results["results"]["bindings"]:
     object_uri = URIRef(result["languageLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
 
+# private/public university
+# Private University
+sparql.setQuery("""
+SELECT ?universityLabel
+WHERE {
+  ?university 
+      wdt:P31 wd:Q902104;  
+      wdt:P17 wd:Q30.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+""")
+
+# Specify the format of the results
+sparql.setReturnFormat(JSON)
+
+# Execute the query and retrieve the results
+results = sparql.query().convert()
+
+for result in results["results"]["bindings"]:
+    # Add RDF triples to the graph
+    subject_uri = URIRef(result["universityLabel"]["value"])
+    predicate_uri = URIRef('typeOfInstitution')
+    object_uri = URIRef('Private University')
+    g.add((subject_uri, predicate_uri, object_uri))
+
+#Public University
+sparql.setQuery("""
+SELECT ?universityLabel
+WHERE {
+  ?university 
+      wdt:P31 wd:Q875538; 
+      wdt:P17 wd:Q30.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+""")
+
+# Specify the format of the results
+sparql.setReturnFormat(JSON)
+
+# Execute the query and retrieve the results
+results = sparql.query().convert()
+
+for result in results["results"]["bindings"]:
+    # Add RDF triples to the graph
+    subject_uri = URIRef(result["universityLabel"]["value"])
+    predicate_uri = URIRef('typeOfInstitution')
+    object_uri = URIRef('Public University')
+    g.add((subject_uri, predicate_uri, object_uri))
+
 for subject, predicate, obj in g:
     # Process the triple
     print("University:", subject)
     print("Predicate:", predicate)
     print("Object:", obj)
-    print()
-
+    print()   
