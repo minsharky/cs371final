@@ -26,6 +26,7 @@ sparql.setReturnFormat(JSON)
 
 # Execute the query and retrieve the results
 results = sparql.query().convert()
+<<<<<<< HEAD
 
 # Process the JSON results and convert them to RDF triples
 # Language Used
@@ -38,3 +39,12 @@ for result in results["results"]["bindings"]:
 
 for triple in g:
     print(triple)
+=======
+for r 
+print(results.keys)
+# Process the results
+# for result in results["results"]["bindings"]:
+#     print(result["universityLabel"]["value"])
+for result in results["results"]["bindings"]:
+    print(result["universityLabel"]["value"])
+>>>>>>> 7b2b1878c3ff9a9696f4e16fa1c53ebd56d79063
