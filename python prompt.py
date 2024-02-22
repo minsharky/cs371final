@@ -55,63 +55,63 @@ cmd = prompt()
 print()
 
 while cmd != 0:
-if cmd == 1:
-    # add-location
-    location_name = input("Enter location name> ").strip().lower()
-    cost = input("Enter cost of this activity> ")
-    try:
-    cost = float(cost)
-    except ValueError:
-    print("Invalid cost, cost can only be numeric value.")
-    continue
-    add_location(baseurl, location_name, cost, username)
+    if cmd == 1:
+        # add-location
+        location_name = input("Enter location name> ").strip().lower()
+        cost = input("Enter cost of this activity> ")
+        try:
+            cost = float(cost)
+        except ValueError:
+            print("Invalid cost, cost can only be numeric value.")
+        continue
+        add_location(baseurl, location_name, cost, username)
 
-elif cmd == 2:
-    # get-locations
-    get_locations(baseurl)
+    elif cmd == 2:
+        # get-locations
+        get_locations(baseurl)
 
-elif cmd == 3:
-    # get-unrated-locations
-    get_unrated_locations(baseurl, username)
+    elif cmd == 3:
+        # get-unrated-locations
+        get_unrated_locations(baseurl, username)
 
-elif cmd == 4:
-    # add-rating
-    location_name = input("Enter location name> ").strip().lower()
-    rating = input("Enter your rating for this location/activity (0~5)> ")
-    try:
-    rating = float(rating)
-    except ValueError:
-    print("Invalid rating, rating can only be numeric value.")
-    continue
-    add_rating(baseurl, location_name, rating, username)
+    elif cmd == 4:
+        # add-rating
+        location_name = input("Enter location name> ").strip().lower()
+        rating = input("Enter your rating for this location/activity (0~5)> ")
+        try:
+            rating = float(rating)
+        except ValueError:
+            print("Invalid rating, rating can only be numeric value.")
+        continue
+        add_rating(baseurl, location_name, rating, username)
 
-elif cmd == 5:
-    # calculate itinerary
-    num_locations = int(input("Enter the number of locations to visit> "))
-    if num_locations <= 0:
-    print(
-        "Invalid number of locations, number of locations must be greater than 0. Restarting calculate itinerary..."
-    )
-    continue
-    max_total_cost = int(
-        input("Enter your maximum budget for the entire trip> "))
-    if max_total_cost < 0:
-    print(
-        "Invalid maximum budget, maximum budget must be non-negative. Restarting calculate itinerary..."
-    )
-    continue
-    calculate_itinerary(baseurl, num_locations, max_total_cost)
+    elif cmd == 5:
+        # calculate itinerary
+        num_locations = int(input("Enter the number of locations to visit> "))
+        if num_locations <= 0:
+            print(
+                "Invalid number of locations, number of locations must be greater than 0. Restarting calculate itinerary..."
+            )
+        continue
+        max_total_cost = int(
+            input("Enter your maximum budget for the entire trip> "))
+        if max_total_cost < 0:
+            print(
+                "Invalid maximum budget, maximum budget must be non-negative. Restarting calculate itinerary..."
+            )
+        continue
+        calculate_itinerary(baseurl, num_locations, max_total_cost)
 
-elif cmd == 6:
-    reset(baseurl)
-    print()
-    print(
-        "*** Thanks for using Trip Planner App! Hope to see you again! :) ***"
-    )
-    sys.exit(0)
+    elif cmd == 6:
+        reset(baseurl)
+        print()
+        print(
+            "*** Thanks for using Trip Planner App! Hope to see you again! :) ***"
+        )
+        sys.exit(0)
 
-else:
-    print("** Unknown command, try again...")
+    else:
+        print("** Unknown command, try again...")
 
 cmd = prompt()
 
