@@ -4,6 +4,7 @@ from rdflib.namespace import RDF, RDFS
 
 # Create an RDF graph
 g = Graph()
+idealUniversityGraph = Graph()
 
 # Set up the SPARQL endpoint URL
 sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
@@ -31,10 +32,15 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["university"]["value"])
-    predicate_uri = URIRef('http://www.wikidata.org/prop/direct/P2936')
-    object_uri = URIRef("http://www.wikidata.org/entity/"+result["language"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
+    predicate_uri = URIRef('language used')
+    object_uri = URIRef(result["languageLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
 
-for triple in g:
-    print(triple)
+for subject, predicate, obj in g:
+    # Process the triple
+    print("University:", subject)
+    print("Predicate:", predicate)
+    print("Object:", obj)
+    print()
+
