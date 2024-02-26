@@ -107,7 +107,7 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["locationLabel"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
     predicate_uri = URIRef('location')
     object_uri = URIRef(result["locationLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
@@ -134,7 +134,7 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["studentCountLabel"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
     predicate_uri = URIRef('studentCount')
     object_uri = URIRef(result["studentCountLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
@@ -165,7 +165,7 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["admissionRateLabel"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
     predicate_uri = URIRef('admissionRate')
     object_uri = URIRef(result["admissionRateLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
@@ -194,7 +194,7 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["foundedLabel"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
     predicate_uri = URIRef('founded')
     object_uri = URIRef(result["foundedLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
@@ -222,7 +222,7 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["memberOfLabel"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
     predicate_uri = URIRef('memberOf')
     object_uri = URIRef(result["memberOfLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
@@ -252,7 +252,7 @@ results = sparql.query().convert()
 # Language Used
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["calendarLabel"]["value"])
+    subject_uri = URIRef(result["universityLabel"]["value"])
     predicate_uri = URIRef('calendar')
     object_uri = URIRef(result["calendarLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
