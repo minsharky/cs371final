@@ -30,11 +30,12 @@ results = sparql.query().convert()
 
 # Process the JSON results and convert them to RDF triples
 # Language Used
+
 for result in results["results"]["bindings"]:
     # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('language used')
-    object_uri = URIRef(result["languageLabel"]["value"])
+    subject_uri = URIRef(result["university"]["value"])
+    predicate_uri = URIRef('languageUsed')
+    object_uri = URIRef(result["language"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
 
 # private/public university
@@ -257,9 +258,6 @@ for result in results["results"]["bindings"]:
     object_uri = URIRef(result["calendarLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
 
-
-
-
 # print out
 for subject, predicate, obj in g:
     # Process the triple
@@ -267,3 +265,21 @@ for subject, predicate, obj in g:
     print("Predicate:", predicate)
     print("Object:", obj)
     print()
+from rdflib.plugins.sparql import prepareQuery
+
+# Assuming the URI for American Sign Language is http://www.wikidata.org/entity/Q14759
+ASL_URI = URIRef("http://www.wikidata.org/entity/Q14759")
+
+# Prepare a SPARQL query to retrieve universities that use American Sign Language
+q = prepareQuery("""
+    SELECT ?university
+    WHERE {
+        ?university <languageUsed> ?language .
+        FILTER(?language = <http://www.wikidata.org/entity/Q14759>)
+    }
+    """, initNs={"languageUsed": URIRef('languageUsed')})
+
+# Execute the query on the graph
+for row in g.query(q):
+    # Each row is a tuple of RDF terms in the SELECT clause
+    print(f"University using American Sign Language: {row.university}")
