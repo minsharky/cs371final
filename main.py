@@ -47,18 +47,6 @@ WHERE {
       wdt:P17 wd:Q30.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-
-# Location (city)
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?location ?locationLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P159 ?location.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-
 """)
 
 # Specify the format of the results
@@ -83,6 +71,37 @@ WHERE {
       wdt:P17 wd:Q30.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
+""")
+
+# Specify the format of the results
+sparql.setReturnFormat(JSON)
+
+# Execute the query and retrieve the results
+results = sparql.query().convert()
+
+for result in results["results"]["bindings"]:
+    # Add RDF triples to the graph
+    subject_uri = URIRef(result["universityLabel"]["value"])
+    predicate_uri = URIRef('typeOfInstitution')
+    object_uri = URIRef('Public University')
+    g.add((subject_uri, predicate_uri, object_uri))
+
+# Location (city)
+sparql.setQuery("""
+    SELECT ?university ?universityLabel ?location ?locationLabel
+WHERE {
+  ?university 
+      wdt:P31 wd:Q3918;  # Instances of all universities
+      wdt:P17 wd:Q30;
+      wdt:P159 ?location.      # City of the university
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+
+# Specify the format of the results
+sparql.setReturnFormat(JSON)
+
+# Execute the query and retrieve the results
+results = sparql.query().convert()
 # Process the JSON results and convert them to RDF triples
 # Language Used
 for result in results["results"]["bindings"]:
@@ -102,7 +121,6 @@ WHERE {
       wdt:P2196 ?studentCount.      # City of the university
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-
 """)
 
 # Specify the format of the results
@@ -110,13 +128,6 @@ sparql.setReturnFormat(JSON)
 
 # Execute the query and retrieve the results
 results = sparql.query().convert()
-
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('typeOfInstitution')
-    object_uri = URIRef('Public University')
-    g.add((subject_uri, predicate_uri, object_uri))
 
 # Process the JSON results and convert them to RDF triples
 # Language Used
