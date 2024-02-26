@@ -16,7 +16,7 @@ WHERE {
   ?university 
       wdt:P31 wd:Q3918;  # Instances of all universities
       wdt:P17 wd:Q30;
-      wdt:P2936 ?language.      # City of the university
+      wdt:P2936 ?language.      
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
 
