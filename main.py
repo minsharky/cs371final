@@ -96,6 +96,7 @@ WHERE {
       wdt:P159 ?location.      # City of the university
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
+""")
 
 # Specify the format of the results
 sparql.setReturnFormat(JSON)
