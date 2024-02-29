@@ -8,23 +8,27 @@ file_path = "./graph_file.ttl"
 
 # Create a new graph instance
 g = Graph()
-graph = Graph()
+g_0 = Graph()
 
 # Parse the graph from the file
 g.parse(file_path, format="turtle")
-graph.parse(file_path, format="turtle")
+g_0.parse(file_path, format="turtle")
 
-q0 = prepareQuery("""
+uni = 'http://www.wikidata.org/entity/Q309350'
+
+q0 = prepareQuery(f"""
     SELECT ?predicate ?value
-    WHERE {
+    WHERE {{
         ?university ?predicate ?value.
-        FILTER(?university = <http://www.wikidata.org/entity/Q7988285>)
-    }
+        FILTER(?university = <{uni}>)
+    }}
 """, initNs={"xsd": XSD})
+
+g.remove((URIRef(uni), None, None))
 
 member, admission, location, language, student, calendar, type, found = None, None, None, None, None, None, None, None
 
-for row in graph.query(q0):
+for row in g_0.query(q0):
     pred = str(row.predicate)
     if(pred == "memberOf"):
         member = row.value.n3()
@@ -61,15 +65,13 @@ q2 = prepareQuery(f"""
     }}
 """, initNs={"xsd": XSD})
 
-q3 = prepareQuery("""
+q3 = prepareQuery(f"""
     SELECT DISTINCT ?university
-    WHERE {
-        # Students count: 20,000 - 30,000
+    WHERE {{
         ?university ?predicate3 ?studentCount .
         FILTER(?predicate3 = "studentCount")
-        FILTER (datatype(?studentCount) = xsd:integer)
-        FILTER(?studentCount >= 20000 && ?studentCount <= 30000)
-    }
+        {'FILTER(?studentCount = "' + student + '")' if student is not None else ''}
+    }}
 """, initNs={"xsd": XSD})
 
 q4 = prepareQuery(f"""
@@ -77,17 +79,16 @@ q4 = prepareQuery(f"""
     WHERE {{
         ?university ?predicate4 ?admissionRate .
         FILTER(?predicate4 = "admissionRate")
-        FILTER (datatype(?admissionRate) = xsd:decimal)
-        FILTER(?admissionRate >= 0.06 && ?admissionRate <= 0.15)
+        {'FILTER(?admissionRate = "' + admission + '")' if admission is not None else ''}
     }}
 """, initNs={"xsd": XSD})
 
 q5 = prepareQuery(f"""
     SELECT DISTINCT ?university
     WHERE {{
-        ?university ?predicate5 ?memberOf .
-        FILTER(?predicate5 = "memberOf")
-        {'FILTER(?memberOf = "' + member + '")' if member is not None else ''}
+        ?university ?predicate5 ?calendar .
+        FILTER(?predicate5 = "calendar")
+        {"FILTER(?calendar = " + calendar + ")" if calendar is not None else ""}
     }}
 """, initNs={"xsd": XSD})
 
@@ -113,9 +114,9 @@ q7 = prepareQuery(f"""
 q8 = prepareQuery(f"""
     SELECT DISTINCT ?university
     WHERE {{
-        ?university ?predicate7 ?calendar .
-        FILTER(?predicate7 = "calendar")
-        {"FILTER(?calendar = " + calendar + ")" if calendar is not None else ""}
+        ?university ?predicate8 ?memberOf .
+        FILTER(?predicate8 = "memberOf")
+        {'FILTER(?memberOf = "' + member + '")' if member is not None else ''}
     }}
 """, initNs={"xsd": XSD})
 
@@ -125,7 +126,7 @@ filteredUniversities = set()
 for row in g.query(q1):
     filteredUniversities.add(row.university)
 
-q = [[q2, language], [q3, student], [q4, admission], [q5, member], [q6, found], [q7, location], [q8, calendar]]
+q = [[q2, language], [q3, student], [q4, admission], [q5, calendar], [q6, found], [q7, location], [q8, member]]
 
 for tempQ, tempV in q:
     tempSet = set()
