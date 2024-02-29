@@ -32,13 +32,13 @@ for row in g_0.query(q0):
     pred = str(row.predicate)
     if(pred == "memberOf"):
         member = row.value.n3()
-    if(pred == "admissionRate"):
+    if(pred == "admissionRateLabel"):
         admission = row.value
     if(pred == "location"):
         location = row.value.n3()
     if(pred == "language"):
         language = (row.value).n3()
-    if(pred == "studentCount"):
+    if(pred == "studentCountLabel"):
         student = row.value
     if(pred == "calendar"):
         calendar = row.value.n3()
@@ -47,6 +47,7 @@ for row in g_0.query(q0):
     if(pred == "founded"):
         found = row.value
 
+print(admission)
 q1 = prepareQuery(f"""
     SELECT DISTINCT ?university
     WHERE {{
@@ -68,18 +69,18 @@ q2 = prepareQuery(f"""
 q3 = prepareQuery(f"""
     SELECT DISTINCT ?university
     WHERE {{
-        ?university ?predicate3 ?studentCount .
-        FILTER(?predicate3 = "studentCount")
-        {'FILTER(?studentCount = "' + student + '")' if student is not None else ''}
+        ?university ?predicate3 ?studentCountLabel .
+        FILTER(?predicate3 = "studentCountLabel")
+        {'FILTER(?studentCountLabel = "' + student + '")' if student is not None else ''}
     }}
 """, initNs={"xsd": XSD})
 
 q4 = prepareQuery(f"""
     SELECT DISTINCT ?university
     WHERE {{
-        ?university ?predicate4 ?admissionRate .
-        FILTER(?predicate4 = "admissionRate")
-        {'FILTER(?admissionRate = "' + admission + '")' if admission is not None else ''}
+        ?university ?predicate4 ?admissionRateLabel .
+        FILTER(?predicate4 = "admissionRateLabel")
+        {'FILTER(?admissionRateLabel = "' + admission + '")' if admission is not None else ''}
     }}
 """, initNs={"xsd": XSD})
 
