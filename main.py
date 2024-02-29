@@ -1,7 +1,20 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph, URIRef, Literal, XSD
 
-# This program takes around 1 minute to run
+def categorize_admission_rate_and_label(subject, predicate, rate, g):
+
+    label = ''
+    if rate < 0.10:
+        label = Literal('far reach')
+    elif rate < 0.2:
+        label = Literal('reach')
+    elif rate < 0.4:
+        label = Literal('target')
+    else:
+        label = Literal('safety')
+
+    g.add((subject, predicate, label))
+
 
 # Create an RDF graph
 g = Graph()
@@ -72,6 +85,9 @@ for result in results["results"]["bindings"]:
             elif attr == "studentCount":
                 object_uri = Literal(result[attr]["value"], datatype=XSD.integer)  # Store as a literal integer
             elif attr == "admissionRate":
+                rate = result[attr]["value"]
+                # Label the admission rate
+                categorize_admission_rate_and_label(subject_uri, Literal('admissionRateLabel'), float(rate), g)
                 object_uri = Literal(result[attr]["value"],  datatype=XSD.decimal)  # Store as a literal decimal
             elif attr == "founded":
                 object_uri = Literal(result[attr]["value"],  datatype=XSD.dateTime)  # Store as a literal dateTime
