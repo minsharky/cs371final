@@ -88,11 +88,11 @@ for result in results["results"]["bindings"]:
                 # Determine the studentCountLevel based on student_count
                 student_count_level_pred = Literal("studentCountLevel")
                 if student_count < 1000:
-                    student_count_level = Literal("Small", datatype=XSD.string)
+                    student_count_level = Literal("Small")
                 elif student_count <= 30000:
-                    student_count_level = Literal("Medium", datatype=XSD.string)
+                    student_count_level = Literal("Medium")
                 else:
-                    student_count_level = Literal("Large", datatype=XSD.string)
+                    student_count_level = Literal("Large")
                 g.add((subject_uri, student_count_level_pred, student_count_level))
             elif attr == "admissionRate":
                 rate = result[attr]["value"]
