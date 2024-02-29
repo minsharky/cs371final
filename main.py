@@ -86,7 +86,7 @@ for result in results["results"]["bindings"]:
                 object_uri = Literal(result[attr]["value"], datatype=XSD.integer)  # Store as a literal integer
                 student_count = int(object_uri)
                 # Determine the studentCountLevel based on student_count
-                student_count_level_pred = Literal("studentCountLevel")
+                student_count_level_pred = Literal("studentCountLabel")
                 if student_count < 1000:
                     student_count_level = Literal("Small")
                 elif student_count <= 30000:
