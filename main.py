@@ -1,6 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
-from rdflib import Graph, Namespace, Literal, URIRef
-from rdflib.namespace import RDF, RDFS
+from rdflib import Graph, URIRef, Literal, XSD
+
+# This program takes around 1 minute to run
 
 # Create an RDF graph
 g = Graph()
@@ -11,15 +12,43 @@ sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 
 # Language Used
 sparql.setQuery("""
-    SELECT ?university ?universityLabel ?language ?languageLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P2936 ?language.      
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-
+    SELECT 
+        ?university 
+        ?universityLabel 
+        ?universityTypeLabel
+        (SAMPLE(?languageValue) AS ?language) 
+        (SAMPLE(?locationValue) AS ?location) 
+        (SAMPLE(?studentCountValue) AS ?studentCount) 
+        (SAMPLE(?admissionRateValue) AS ?admissionRate) 
+        (SAMPLE(?foundedValue) AS ?founded) 
+        (SAMPLE(?memberOfValue) AS ?memberOf) 
+        (SAMPLE(?calendarValue) AS ?calendar) 
+    WHERE {
+    {
+        ?university wdt:P31 wd:Q875538;  # Public universities
+        BIND("Public" AS ?universityTypeLabel)
+    } UNION {
+        ?university wdt:P31 wd:Q62078547;  # Public Research
+        BIND("Public" AS ?universityTypeLabel)
+    } UNION {
+        ?university wdt:P31 wd:Q902104;  # Private universities
+        BIND("Private" AS ?universityTypeLabel)
+    } UNION {
+        ?university wdt:P31 wd:Q23002054;  # Private not-for-profit universities
+        BIND("Private" AS ?universityTypeLabel)
+    }
+    ?university wdt:P17 wd:Q30.        # Located in the United States
+    OPTIONAL { ?university wdt:P2936 ?languageValue. }
+    OPTIONAL { ?university wdt:P159 ?locationValue. }
+    OPTIONAL { ?university wdt:P2196 ?studentCountValue. }
+    OPTIONAL { ?university wdt:P5822 ?admissionRateValue. }
+    OPTIONAL { ?university wdt:P571 ?foundedValue. }
+    OPTIONAL { ?university wdt:P463 ?memberOfValue. }
+    OPTIONAL { ?university wdt:P10588 ?calendarValue. }
+    
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    GROUP BY ?university ?universityLabel ?universityTypeLabel
 """)
 
 # Specify the format of the results
@@ -28,259 +57,38 @@ sparql.setReturnFormat(JSON)
 # Execute the query and retrieve the results
 results = sparql.query().convert()
 
-# Process the JSON results and convert them to RDF triples
-# Language Used
-
 for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
     subject_uri = URIRef(result["university"]["value"])
-    predicate_uri = URIRef('languageUsed')
-    object_uri = URIRef(result["language"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
 
-# private/public university
-# Private University
-sparql.setQuery("""
-SELECT ?universityLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q902104;  
-      wdt:P17 wd:Q30.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-""")
+    # Process each attribute with a check for existence
+    attributes = ["universityTypeLabel", "language", "location", "studentCount", "admissionRate", "founded", "memberOf", "calendar"]
+    for attr in attributes:
+        if attr in result:
+            predicate_uri = Literal(attr)
+            object_uri = None
+            # Check if the attribute is universityTypeLabel
+            if attr == "universityTypeLabel":
+                object_uri = Literal(result[attr]["value"])  # Store as a literal string
+            elif attr == "studentCount":
+                object_uri = Literal(result[attr]["value"], datatype=XSD.integer)  # Store as a literal integer
+            elif attr == "admissionRate":
+                object_uri = Literal(result[attr]["value"],  datatype=XSD.decimal)  # Store as a literal decimal
+            elif attr == "founded":
+                object_uri = Literal(result[attr]["value"],  datatype=XSD.dateTime)  # Store as a literal dateTime
+            else:
+                object_uri = URIRef(result[attr]["value"])
+            g.add((subject_uri, predicate_uri, object_uri))
 
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('typeOfInstitution')
-    object_uri = URIRef('Private University')
-    g.add((subject_uri, predicate_uri, object_uri))
-
-#Public University
-sparql.setQuery("""
-SELECT ?universityLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q875538; 
-      wdt:P17 wd:Q30.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('typeOfInstitution')
-    object_uri = URIRef('Public University')
-    g.add((subject_uri, predicate_uri, object_uri))
-
-# Location (city)
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?location ?locationLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P159 ?location.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-# Process the JSON results and convert them to RDF triples
-# Language Used
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('location')
-    object_uri = URIRef(result["locationLabel"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
-
-# Student count
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?studentCount ?studentCountLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P2196 ?studentCount.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-# Process the JSON results and convert them to RDF triples
-# Language Used
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('studentCount')
-    object_uri = URIRef(result["studentCountLabel"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
-
-
-
-
-# Admission Rate
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?admissionRate ?admissionRateLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P5822 ?admissionRate.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-# Process the JSON results and convert them to RDF triples
-# Language Used
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('admissionRate')
-    object_uri = URIRef(result["admissionRateLabel"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
-
-
-# Founded
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?founded ?foundedLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P571 ?founded.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-# Process the JSON results and convert them to RDF triples
-# Language Used
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('founded')
-    object_uri = URIRef(result["foundedLabel"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
-
-# Member of (ivy league etc.)
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?memberOf ?memberOfLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P463 ?memberOf.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-# Process the JSON results and convert them to RDF triples
-# Language Used
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('memberOf')
-    object_uri = URIRef(result["memberOfLabel"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
-
-
-
-# academic calendar type
-sparql.setQuery("""
-    SELECT ?university ?universityLabel ?calendar ?calendarLabel
-WHERE {
-  ?university 
-      wdt:P31 wd:Q3918;  # Instances of all universities
-      wdt:P17 wd:Q30;
-      wdt:P10588 ?calendar.      # City of the university
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}
-
-""")
-
-# Specify the format of the results
-sparql.setReturnFormat(JSON)
-
-# Execute the query and retrieve the results
-results = sparql.query().convert()
-
-# Process the JSON results and convert them to RDF triples
-# Language Used
-for result in results["results"]["bindings"]:
-    # Add RDF triples to the graph
-    subject_uri = URIRef(result["universityLabel"]["value"])
-    predicate_uri = URIRef('calendar')
-    object_uri = URIRef(result["calendarLabel"]["value"])
-    g.add((subject_uri, predicate_uri, object_uri))
-
-# # print out
+# # Print out the triples
 # for subject, predicate, obj in g:
-#     # Process the triple
 #     print("University:", subject)
 #     print("Predicate:", predicate)
 #     print("Object:", obj)
 #     print()
-    
-from rdflib.plugins.sparql import prepareQuery
 
-# Prepare a SPARQL query to retrieve universities that use American Sign Language
-q = prepareQuery("""
-    SELECT ?university
-    WHERE {
-        ?university <typeOfInstitution> ?institutionType .
-        ?university <languageUsed> ?language .
-        
-        ?university ex:studentCount ?studentCount .
-        FILTER(?language = <http://www.wikidata.org/entity/Q14759>)
-    }
-    """, initNs={"languageUsed": URIRef('languageUsed')})
+# File path for storing the graph
+file_path = "./graph_file.ttl"
 
-# Execute the query on the graph
-for row in g.query(q):
-    # Each row is a tuple of RDF terms in the SELECT clause
-    print(f"University using American Sign Language: {row.university}")
+# Serialize and save the graph
+with open(file_path, "wb") as f:
+    g.serialize(f, format="turtle")
