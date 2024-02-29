@@ -258,6 +258,14 @@ for result in results["results"]["bindings"]:
     object_uri = URIRef(result["calendarLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
 
+# # print out
+# for subject, predicate, obj in g:
+#     # Process the triple
+#     print("University:", subject)
+#     print("Predicate:", predicate)
+#     print("Object:", obj)
+#     print()
+    
 from rdflib.plugins.sparql import prepareQuery
 
 # Prepare a SPARQL query to retrieve universities that use American Sign Language
