@@ -42,6 +42,8 @@ for row in graph.query(q0):
         type = str(row.value)
     if(pred == "founded"):
         found = row.value
+        start_year = int(found[:4]) - 50
+        end_year = int(found[:4]) + 50
 
 q1 = prepareQuery(f"""
     SELECT DISTINCT ?university
@@ -91,14 +93,14 @@ q5 = prepareQuery(f"""
     }}
 """, initNs={"xsd": XSD})
 
-q6 = prepareQuery("""
+q6 = prepareQuery(f"""
     SELECT DISTINCT ?university
-    WHERE {
+    WHERE {{
         ?university ?predicate6 ?founded .
         FILTER(?predicate6 = "founded")
         BIND(year(xsd:dateTime(?founded)) AS ?year)
-        FILTER(?year >= 1850 && ?year <= 1900)
-    }
+        FILTER(?year >= {start_year} && ?year <= {end_year})
+        }}
 """, initNs={"xsd": XSD})
 
 q7 = prepareQuery(f"""
@@ -125,7 +127,7 @@ filteredUniversities = set()
 for row in g.query(q1):
     filteredUniversities.add(row.university)
 
-q = [[q2, language], [q3, student], [q4, admission], [q5, member], [q6, found], [q7, location], [q8, calendar]]
+q = [[q2, language], [q3, student], [q4, admission], [q5, member],  [q7, location], [q8, calendar]]
 
 for tempQ, tempV in q:
     tempSet = set()
