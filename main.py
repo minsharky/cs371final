@@ -1,11 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph, URIRef, Literal, XSD
 
-# This program takes around 1 minute to run
 
-# Create an RDF graph
-g = Graph()
-idealUniversityGraph = Graph()
 
 # Set up the SPARQL endpoint URL
 sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
