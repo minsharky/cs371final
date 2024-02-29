@@ -258,23 +258,16 @@ for result in results["results"]["bindings"]:
     object_uri = URIRef(result["calendarLabel"]["value"])
     g.add((subject_uri, predicate_uri, object_uri))
 
-# print out
-for subject, predicate, obj in g:
-    # Process the triple
-    print("University:", subject)
-    print("Predicate:", predicate)
-    print("Object:", obj)
-    print()
 from rdflib.plugins.sparql import prepareQuery
-
-# Assuming the URI for American Sign Language is http://www.wikidata.org/entity/Q14759
-ASL_URI = URIRef("http://www.wikidata.org/entity/Q14759")
 
 # Prepare a SPARQL query to retrieve universities that use American Sign Language
 q = prepareQuery("""
     SELECT ?university
     WHERE {
+        ?university <typeOfInstitution> ?institutionType .
         ?university <languageUsed> ?language .
+        
+        ?university ex:studentCount ?studentCount .
         FILTER(?language = <http://www.wikidata.org/entity/Q14759>)
     }
     """, initNs={"languageUsed": URIRef('languageUsed')})
