@@ -49,7 +49,6 @@ for row in g_0.query(q0):
         start_year = int(found[:4]) - 50
         end_year = int(found[:4]) + 50
 
-print(admission)
 q1 = prepareQuery(f"""
     SELECT DISTINCT ?university
     WHERE {{
