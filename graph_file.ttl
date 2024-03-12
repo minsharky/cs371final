@@ -7611,7 +7611,7 @@
     "calendar" <http://www.wikidata.org/entity/Q3955006> ;
     "founded" "1870-03-24T00:00:00+00:00"^^xsd:dateTime ;
     "language" <http://www.wikidata.org/entity/Q1860> ;
-    "memberOf" <http://www.wikidata.org/entity/Q118398> ;
+    "memberOf" <http://www.wikidata.org/entity/Q647039> ;
     "studentCount" 19366 ;
     "studentCountLevel" "Medium"^^xsd:string ;
     "universityTypeLabel" "Private" .
@@ -7640,7 +7640,7 @@
     "calendar" <http://www.wikidata.org/entity/Q3955006> ;
     "founded" "1865-01-01T00:00:00+00:00"^^xsd:dateTime ;
     "location" <http://www.wikidata.org/entity/Q164380> ;
-    "memberOf" <http://www.wikidata.org/entity/Q118398> ;
+    "memberOf" <http://www.wikidata.org/entity/Q2842325> ;
     "studentCount" 6798 ;
     "studentCountLevel" "Medium"^^xsd:string ;
     "universityTypeLabel" "Private" .
