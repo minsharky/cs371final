@@ -44,7 +44,6 @@ for row in g_0.query(q0):
         calendar = row.value.n3()
     if(pred == "universityTypeLabel"):
         type = str(row.value)
-
     if(pred == "founded"):
         found = row.value
         start_year = int(found[:4]) - 50
