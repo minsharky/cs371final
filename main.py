@@ -1,7 +1,24 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph, URIRef, Literal, XSD
 
+def categorize_admission_rate_and_label(subject, predicate, rate, g):
 
+    label = ''
+    if rate < 0.10:
+        label = Literal('far reach')
+    elif rate < 0.2:
+        label = Literal('reach')
+    elif rate < 0.4:
+        label = Literal('target')
+    else:
+        label = Literal('safety')
+
+    g.add((subject, predicate, label))
+
+
+# Create an RDF graph
+g = Graph()
+idealUniversityGraph = Graph()
 
 # Set up the SPARQL endpoint URL
 sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
@@ -57,7 +74,7 @@ for result in results["results"]["bindings"]:
     subject_uri = URIRef(result["university"]["value"])
 
     # Process each attribute with a check for existence
-    attributes = ["universityTypeLabel", "language", "location", "studentCount","admissionRate", "founded", "memberOf", "calendar"]
+    attributes = ["universityTypeLabel", "language", "location", "studentCount", "admissionRate", "founded", "memberOf", "calendar"]
     for attr in attributes:
         if attr in result:
             predicate_uri = Literal(attr)
@@ -78,6 +95,9 @@ for result in results["results"]["bindings"]:
                     student_count_level = Literal("Large", datatype=XSD.string)
                 g.add((subject_uri, student_count_level_pred, student_count_level))
             elif attr == "admissionRate":
+                rate = result[attr]["value"]
+                # Label the admission rate
+                categorize_admission_rate_and_label(subject_uri, Literal('admissionRateLabel'), float(rate), g)
                 object_uri = Literal(result[attr]["value"],  datatype=XSD.decimal)  # Store as a literal decimal
             elif attr == "founded":
                 object_uri = Literal(result[attr]["value"],  datatype=XSD.dateTime)  # Store as a literal dateTime
