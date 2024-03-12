@@ -128,7 +128,7 @@ filteredUniversities = set()
 for row in g.query(q1):
     filteredUniversities.add(row.university)
 
-q = [[q2, language], [q3, student], [q4, admission], [q5, calendar], [q7, location], [q8, member]]
+q = [[q1, type], [q2, language], [q3, student], [q4, admission], [q5, calendar], [q6, (start_year, end_year)], [q7, location], [q8, member]]
 
 for tempQ, tempV in q:
     tempSet = set()

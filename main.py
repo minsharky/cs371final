@@ -1,8 +1,8 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib import Graph, URIRef, Literal, XSD
 
+# Categorize admission rates
 def categorize_admission_rate_and_label(subject, predicate, rate, g):
-
     label = ''
     if rate < 0.10:
         label = Literal('far reach')
@@ -15,6 +15,17 @@ def categorize_admission_rate_and_label(subject, predicate, rate, g):
 
     g.add((subject, predicate, label))
 
+# Categorize student counts
+def categorize_student_count_and_label(subject, predicate, rate, g):
+    label = ''
+    if rate < 1000:
+        label = Literal('Small')
+    elif rate < 30000:
+        label = Literal('Medium')
+    else:
+        label = Literal('Large')
+
+    g.add((subject, predicate, label))
 
 # Create an RDF graph
 g = Graph()
@@ -23,7 +34,7 @@ idealUniversityGraph = Graph()
 # Set up the SPARQL endpoint URL
 sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
 
-# Language Used
+# SPARQL Query for all attributes
 sparql.setQuery("""
     SELECT 
         ?university 
@@ -83,17 +94,10 @@ for result in results["results"]["bindings"]:
             if attr == "universityTypeLabel":
                 object_uri = Literal(result[attr]["value"])  # Store as a literal string
             elif attr == "studentCount":
+                count = result[attr]["value"]
+                # Label Student Count
+                categorize_student_count_and_label(subject_uri, Literal('studentCountLevel'), int(count), g)
                 object_uri = Literal(result[attr]["value"], datatype=XSD.integer)  # Store as a literal integer
-                student_count = int(object_uri)
-                # Determine the studentCountLevel based on student_count
-                student_count_level_pred = Literal("studentCountLevel")
-                if student_count < 1000:
-                    student_count_level = Literal("Small", datatype=XSD.string)
-                elif student_count <= 30000:
-                    student_count_level = Literal("Medium", datatype=XSD.string)
-                else:
-                    student_count_level = Literal("Large", datatype=XSD.string)
-                g.add((subject_uri, student_count_level_pred, student_count_level))
             elif attr == "admissionRate":
                 rate = result[attr]["value"]
                 # Label the admission rate
@@ -104,13 +108,6 @@ for result in results["results"]["bindings"]:
             else:
                 object_uri = URIRef(result[attr]["value"])
             g.add((subject_uri, predicate_uri, object_uri))
-
-# # Print out the triples
-# for subject, predicate, obj in g:
-#     print("University:", subject)
-#     print("Predicate:", predicate)
-#     print("Object:", obj)
-#     print()
 
 # File path for storing the graph
 file_path = "./graph_file.ttl"

@@ -1,4 +1,3 @@
-
 # Project Name: University Recommender
 
 ## Team Members
