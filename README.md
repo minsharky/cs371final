@@ -1,5 +1,5 @@
 # cs371final
-The main.py file includes all the SPARQL queries used to get the university information from Wikidata and takes all the data into a RDF graph used for the reasoning.
+The main.py file includes all the SPARQL queries used to get the university information from Wikidata and takes all the data into an RDF graph used for the reasoning.
 The RDF graph is saved into graph_file.ttl file.
 And all the reasoning was written in the reasoning.py file.
 
